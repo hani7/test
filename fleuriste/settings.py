@@ -9,6 +9,8 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
 DEBUG = os.getenv("DEBUG", "1") == "1"
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
+
+
 INSTALLED_APPS = [
     "django.contrib.admin","django.contrib.auth","django.contrib.contenttypes",
     "django.contrib.sessions","django.contrib.messages","django.contrib.staticfiles",
@@ -48,16 +50,30 @@ WSGI_APPLICATION = "fleuriste.wsgi.application"
 ASGI_APPLICATION = "fleuriste.asgi.application"
 
 # DB: SQLite pour démarrer
-DATABASES = {
-    "default": {
-        "ENGINE": os.getenv("DB_ENGINE","django.db.backends.sqlite3"),
-        "NAME": os.getenv("DB_NAME", BASE_DIR / "db.sqlite3"),
-        "USER": os.getenv("DB_USER",""),
-        "PASSWORD": os.getenv("DB_PASSWORD",""),
-        "HOST": os.getenv("DB_HOST",""),
-        "PORT": os.getenv("DB_PORT",""),
+DATABASES = {}
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    try:
+        import dj_database_url
+        DATABASES["default"] = dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=os.getenv("RENDER","0")=="1"
+        )
+    except Exception as e:
+        # fallback SQLite si le module n'est pas dispo
+        print("Warning: dj_database_url indisponible, fallback SQLite:", e)
+        DATABASES["default"] = {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+else:
+    # pas de DATABASE_URL => SQLite local
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
-}
 
 LANGUAGE_CODE = "fr-fr"
 TIME_ZONE = os.getenv("TIME_ZONE","Africa/Algiers")

@@ -15,4 +15,19 @@
     <a class="btn" href="{% url 'home' %}">Retour à l’accueil</a>
   </div>
 </div>
+<script>
+(async () => {
+  // essaie d’appeler l’agent local (sur la machine) pour ouverture
+  try {
+    // Exemple: slot = {{ order.slot.relay_channel }}
+    const url = new URL('http://localhost:9000/open');
+    url.searchParams.set('slot', {{ order.slot.relay_channel }});
+    url.searchParams.set('duration_ms', 600);
+    await fetch(url, { method: 'POST' });
+  } catch (e) {
+    console.log('Agent local non joignable:', e);
+  }
+})();
+</script>
+
 </body></html>
