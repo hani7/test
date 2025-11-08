@@ -1,0 +1,12 @@
+[
+  {"model": "fleur.distributor", "pk": 1,
+   "fields": {"name": "Machine 1", "serial_number": "FLEUR-001", "location": "Boutique", "is_online": true}},
+  {"model": "fleur.slot", "pk": 1, "fields": {"distributor": 1, "code": "D1", "relay_channel": 1, "door_type": "BIG", "capacity": 1, "quantity": 1}},
+  {"model": "fleur.slot", "pk": 2, "fields": {"distributor": 1, "code": "D2", "relay_channel": 2, "door_type": "BIG", "capacity": 1, "quantity": 1}},
+  {"model": "fleur.slot", "pk": 3, "fields": {"distributor": 1, "code": "L1", "relay_channel": 3, "door_type": "LOCKER", "capacity": 1, "quantity": 1}},
+  {"model": "fleur.slot", "pk": 4, "fields": {"distributor": 1, "code": "L2", "relay_channel": 4, "door_type": "LOCKER", "capacity": 1, "quantity": 1}},
+  {"model": "fleur.slot", "pk": 5, "fields": {"distributor": 1, "code": "L3", "relay_channel": 5, "door_type": "LOCKER", "capacity": 1, "quantity": 1}},
+  {"model": "fleur.slot", "pk": 6, "fields": {"distributor": 1, "code": "L4", "relay_channel": 6, "door_type": "LOCKER", "capacity": 1, "quantity": 1}},
+  {"model": "fleur.slot", "pk": 7, "fields": {"distributor": 1, "code": "L5", "relay_channel": 7, "door_type": "LOCKER", "capacity": 1, "quantity": 1}},
+  {"model": "fleur.slot", "pk": 8, "fields": {"distributor": 1, "code": "L6", "relay_channel": 8, "door_type": "LOCKER", "capacity": 1, "quantity": 1}}
+]

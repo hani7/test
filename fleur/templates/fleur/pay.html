@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Paiement</title>
+  <style>
+    body{font-family:system-ui;margin:0;background:#101010;color:#eaeaea}
+    .wrap{max-width:720px;margin:40px auto;padding:16px}
+    .card{background:#171717;border:1px solid #2a2a2a;border-radius:14px;padding:18px}
+    .btn{display:inline-block;background:#22c55e;color:#0b0b0b;font-weight:800;padding:12px 18px;border-radius:12px;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Paiement</h1>
+      <p>Commande #{{ order.id }} – Casier/porte : <b>{{ order.slot.code }}</b></p>
+      <p>Montant : <b>{{ order.amount }} DA</b></p>
+      <form method="post">
+        {% csrf_token %}
+        <button class="btn" type="submit">Payer maintenant</button>
+      </form>
+      <p style="margin-top:10px;opacity:.7">Démo : ce bouton marque la commande comme payée et demande l’ouverture.</p>
+    </div>
+  </div>
+</body>
+</html>

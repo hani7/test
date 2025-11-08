@@ -1,0 +1,18 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Succès</title>
+<style>body{font-family:system-ui;background:#061d12;color:#d1fae5;margin:0}
+.wrap{max-width:680px;margin:40px auto;padding:16px}
+.card{background:#062a18;border:1px solid #0a4025;border-radius:14px;padding:18px}
+.btn{background:#10b981;color:#062a18;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:800}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>✅ Paiement confirmé</h1>
+    <p>Commande #{{ order.id }} — Porte <b>{{ order.slot.code }}</b> en cours d’ouverture…</p>
+    <a class="btn" href="{% url 'home' %}">Retour à l’accueil</a>
+  </div>
+</div>
+</body></html>

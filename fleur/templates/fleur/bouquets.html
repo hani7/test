@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mes bouquets</title>
+  <style>
+    :root{
+      --bg:#0f1220; --card:#161a2e; --border:#2a2f4a; --text:#ececec;
+      --btn:#60a5fa; --btn2:#22c55e; --btn3:#ef4444;
+      --badge-bg:#1e293b; --badge-tx:#93c5fd; --badge-bd:#2a3b57;
+      --ok-bg:#052d1a; --ok-bd:#0a4b2d; --ok-tx:#b7f7d0;
+      --ko-bg:#3a1212; --ko-bd:#5a1e1e; --ko-tx:#ffd2d2;
+    }
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;margin:0;background:var(--bg);color:var(--text)}
+    .wrap{max-width:1080px;margin:24px auto;padding:16px}
+    h1{margin:0 0 14px 0}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px 0}
+    .btn{display:inline-block;background:var(--btn);color:#0b1023;font-weight:700;padding:10px 16px;border-radius:10px;text-decoration:none;border:none;cursor:pointer}
+    .btn.green{background:var(--btn2);color:#0b1023}
+    .btn.red{background:var(--btn3);color:#fff}
+    .btn[disabled]{opacity:.5;pointer-events:none}
+    .messages{margin-bottom:12px}
+    .msg{padding:10px 12px;border-radius:10px;margin:6px 0}
+    .ok{background:var(--ok-bg);color:var(--ok-tx);border:1px solid var(--ok-bd)}
+    .ko{background:var(--ko-bg);color:var(--ko-tx);border:1px solid var(--ko-bd)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+    .badge{display:inline-block;background:var(--badge-bg);color:var(--badge-tx);border:1px solid var(--badge-bd);padding:3px 8px;border-radius:999px;font-size:12px}
+    .row-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Mes bouquets</h1>
+
+    <!-- Messages flash -->
+    <div class="messages">
+      {% for m in messages %}
+        <div class="msg {% if m.tags == 'success' %}ok{% else %}ko{% endif %}">{{ m }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- Barre maintenance -->
+    <div class="toolbar">
+      <form method="post" action="{% url 'open_both_big' %}">
+        {% csrf_token %}
+        <button class="btn green" type="submit">Ouvrir portes D1 &amp; D2</button>
+      </form>
+
+      <form method="post" action="{% url 'open_all_lockers' %}">
+        {% csrf_token %}
+        <button class="btn green" type="submit">Ouvrir tous les petits casiers</button>
+      </form>
+
+      <a class="btn" href="{% url 'home' %}">← Retour</a>
+    </div>
+
+    <!-- Liste des slots -->
+    <div class="grid">
+      {% for s in slots %}
+        <div class="card">
+          <h3 style="margin:0 0 10px 0">{{ s.code }} — {{ s.get_door_type_display }}</h3>
+          <p style="margin:6px 0">Canal relais : <b>{{ s.relay_channel }}</b></p>
+          <p style="margin:6px 0">Stock : <span class="badge">{{ s.quantity }}</span></p>
+
+          <div class="row-btns">
+            <!-- Acheter (flux normal) -->
+            <form action="{% url 'buy_now' s.id %}" method="post">
+              {% csrf_token %}
+              <button class="btn" {% if s.quantity|default:0 <= 0 %}disabled{% endif %}>Buy now</button>
+            </form>
+
+            <!-- Ouvrir direct (maintenance) — pour TOUT slot (grand ou petit) -->
+            <form action="{% url 'open_door' s.id %}" method="post">
+              {% csrf_token %}
+              <button class="btn green" type="submit">Ouvrir {{ s.code }}</button>
+            </form>
+          </div>
+        </div>
+      {% empty %}
+        <p>Aucun casier n’est configuré.</p>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>

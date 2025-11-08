@@ -1,0 +1,18 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Échec</title>
+<style>body{font-family:system-ui;background:#2a0b0b;color:#fee2e2;margin:0}
+.wrap{max-width:680px;margin:40px auto;padding:16px}
+.card{background:#3a0f0f;border:1px solid #5b1a1a;border-radius:14px;padding:18px}
+.btn{background:#ef4444;color:#3a0f0f;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:800}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>❌ Ouverture échouée</h1>
+    <p>Commande #{{ order.id }} — Merci d’appeler l’assistance.</p>
+    <a class="btn" href="{% url 'home' %}">Retour à l’accueil</a>
+  </div>
+</div>
+</body></html>
