@@ -7,8 +7,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
 DEBUG = os.getenv("DEBUG", "1") == "1"
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
-
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com","https://test-uvee.onrender.com"]  # le point autorise tous les sous-domaines
+CSRF_TRUSTED_ORIGINS = ["https://test-uvee.onrender.com"]
 
 
 INSTALLED_APPS = [
