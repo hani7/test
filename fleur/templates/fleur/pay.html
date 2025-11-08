@@ -8,21 +8,114 @@
     body{font-family:system-ui;margin:0;background:#101010;color:#eaeaea}
     .wrap{max-width:720px;margin:40px auto;padding:16px}
     .card{background:#171717;border:1px solid #2a2a2a;border-radius:14px;padding:18px}
-    .btn{display:inline-block;background:#22c55e;color:#0b0b0b;font-weight:800;padding:12px 18px;border-radius:12px;text-decoration:none}
+    .btn{display:inline-block;background:#22c55e;color:#0b0b0b;font-weight:800;padding:12px 18px;border-radius:12px;text-decoration:none;border:none;cursor:pointer}
+    .btn.alt{background:#60a5fa;color:#0b1023}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .meter{height:12px;background:#2a2a2a;border-radius:999px;overflow:hidden}
+    .fill{height:100%;background:#22c55e;width:0%}
+    .muted{opacity:.75}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
       <h1>Paiement</h1>
-      <p>Commande #{{ order.id }} – Casier/porte : <b>{{ order.slot.code }}</b></p>
-      <p>Montant : <b>{{ order.amount }} DA</b></p>
-      <form method="post">
-        {% csrf_token %}
-        <button class="btn" type="submit">Payer maintenant</button>
-      </form>
-      <p style="margin-top:10px;opacity:.7">Démo : ce bouton marque la commande comme payée et demande l’ouverture.</p>
+      <p>Commande #{{ order.id }} — Casier/porte : <b>{{ order.slot.code }}</b></p>
+      <p>Montant à payer : <b id="amount">{{ order.amount }}</b> DA</p>
+
+      <div class="row" style="margin:12px 0">
+        <!-- Paiement par espèces via TB74 -->
+        <button id="cashBtn" class="btn alt" type="button">Payer en espèces (TB74)</button>
+
+        <!-- Paiement “manuel” (démo existante) -->
+        <form id="fallbackForm" method="post" style="display:inline">
+          {% csrf_token %}
+          <button class="btn" type="submit">Payer maintenant (manuel)</button>
+        </form>
+      </div>
+
+      <div id="cashBox" style="display:none">
+        <p class="muted">Insérez les billets dans le monnayeur…</p>
+        <p>Total inséré : <b id="total">0</b> / <b id="target">{{ order.amount }}</b> DA</p>
+        <div class="meter"><div id="fill" class="fill"></div></div>
+        <p id="status" class="muted" style="margin-top:6px">En attente de billets…</p>
+        <button id="cancelBtn" class="btn" type="button" style="margin-top:10px;background:#ef4444;color:#fff">Annuler espèces</button>
+      </div>
+
+      <p style="margin-top:10px;opacity:.7">
+        Astuce : l’agent local doit tourner sur <code>http://localhost:9000</code>.
+      </p>
     </div>
   </div>
+
+<script>
+(function(){
+  const cashBtn = document.getElementById('cashBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const cashBox = document.getElementById('cashBox');
+  const totalEl = document.getElementById('total');
+  const target = parseInt(document.getElementById('target').textContent, 10);
+  const fill = document.getElementById('fill');
+  const statusEl = document.getElementById('status');
+  const fallbackForm = document.getElementById('fallbackForm');
+
+  let sessionId = "order-{{ order.id }}";
+  let ws;
+
+  async function startCash() {
+    cashBox.style.display = '';
+    cashBtn.disabled = true;
+    statusEl.textContent = 'Initialisation…';
+    // 1) start session @ agent
+    try {
+      const res = await fetch('http://localhost:9000/bill/start?session_id=' + encodeURIComponent(sessionId) + '&target=' + target, {method:'POST'});
+      if (!res.ok) throw new Error('bill/start failed');
+    } catch (e) {
+      statusEl.textContent = 'Agent non joignable. Vérifie qu’il tourne sur la machine.';
+      cashBtn.disabled = false;
+      return;
+    }
+    // 2) open WS
+    try {
+      ws = new WebSocket('ws://localhost:9000/bill/ws');
+      ws.onopen = () => {
+        ws.send(JSON.stringify({session_id: sessionId, hello: true}));
+        statusEl.textContent = 'En attente de billets…';
+      };
+      ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.type === 'bill') {
+          const total = parseInt(totalEl.textContent, 10) + parseInt(msg.value, 10);
+          totalEl.textContent = total;
+          const pct = Math.min(100, Math.round((total/target)*100));
+          fill.style.width = pct + '%';
+          statusEl.textContent = `+${msg.value} DA reçu`;
+          if (total >= target) {
+            statusEl.textContent = 'Montant atteint. Validation…';
+            // Submit le paiement “manuel” existant pour que le serveur marque PAID et ouvre la porte
+            fallbackForm.submit();
+          }
+        }
+      };
+      ws.onerror = () => { statusEl.textContent = 'Erreur WebSocket.'; };
+      ws.onclose = () => { /* silencieux */ };
+    } catch (e) {
+      statusEl.textContent = 'Impossible d’ouvrir le WebSocket.';
+      cashBtn.disabled = false;
+    }
+  }
+
+  async function stopCash() {
+    try { await fetch('http://localhost:9000/bill/stop?session_id=' + encodeURIComponent(sessionId), {method:'POST'}); } catch(e){}
+    if (ws) { try { ws.close(); } catch(e){} ws = null; }
+    cashBtn.disabled = false;
+    cashBox.style.display = 'none';
+    totalEl.textContent = '0'; fill.style.width = '0%';
+  }
+
+  cashBtn.addEventListener('click', startCash);
+  cancelBtn.addEventListener('click', stopCash);
+})();
+</script>
 </body>
 </html>
