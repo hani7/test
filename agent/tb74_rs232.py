@@ -24,7 +24,7 @@ class BillEvent:
 
 @dataclass
 class TB74Config:
-    port: str = os.getenv("TB74_PORT", "/dev/ttyUSB1")
+    port: str = os.getenv("TB74_PORT", "/dev/ttyS5")
     baud: int = int(os.getenv("TB74_BAUD", "9600"))
     simulate: bool = os.getenv("TB74_SIM", "0") == "1"
     # Canal/code -> valeur (DA). Mets ici tes 500/1000/2000 :

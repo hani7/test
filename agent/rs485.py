@@ -11,7 +11,7 @@ class LockDriver:
     [0xAA][ADDR=0x01][CMD=0x10][CHANNEL][DUR_H][DUR_L][CRC_XOR]
     Adapte si ta carte a un autre protocole.
     """
-    def __init__(self, port="/dev/ttyUSB0", baud=9600, addr=1):
+    def __init__(self, port="/dev/ttyS5", baud=9600, addr=1):
         self.ser = serial.Serial(port, baudrate=baud, timeout=0.5)
         self.addr = addr
 
