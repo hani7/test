@@ -16,7 +16,11 @@ except ImportError:
 from tb74_rs232 import TB74BillAcceptor, TB74Config, BillEvent
 
 # --------- Config série portes ---------
+<<<<<<< HEAD
 SERIAL_PORT = os.getenv("SERIAL_PORT", "/dev/ttyS5")
+=======
+SERIAL_PORT = os.getenv("SERIAL_PORT", "/dev/ttyS5")
+>>>>>>> d131bf99810b871477a0090032392574e82ec565
 BAUD = int(os.getenv("SERIAL_BAUD", "9600"))
 
 app = FastAPI(title="Fleuriste Agent")
